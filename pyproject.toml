@@ -7,6 +7,21 @@ name = "openemotion"
 version = "0.1.0"
 description = "Open-source facial emotion recognition using PyTorch and OpenCV"
 requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.6,<3", "torchvision>=0.21,<1", "opencv-python>=4.10,<5",
+    "numpy>=1.26,<3", "Pillow>=11,<13",
+    "fastapi>=0.115,<1", "uvicorn>=0.30,<1", "httpx>=0.28,<1",
+    "pydantic>=2.10,<3", "pydantic-settings>=2.6,<3", "python-multipart>=0.0.18,<1",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10", "pytest-asyncio>=0.24,<2"]
+training = ["pandas", "matplotlib", "seaborn", "scikit-learn"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"

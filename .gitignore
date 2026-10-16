@@ -24,6 +24,7 @@ env/
 # Secrets / local configuration
 .env
 .env.*
+!.env.example
 
 # ML artifacts
 *.pth
@@ -34,6 +35,7 @@ env/
 # Data
 data/
 datasets/
+/fer2013
 
 # Generated output
 outputs/

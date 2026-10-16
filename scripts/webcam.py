@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from openemotion.config import CLASS_NAMES
-from openemotion.face_detector import create_face_detector
-from openemotion.inference import predict_emotion
-from openemotion.model import load_model
+from openemotion.detection.face_detector import create_face_detector
+from openemotion.model.emotion_model import load_model
+from openemotion.model.inference import predict_emotion
 
 
 def main():
@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
 
     device = torch.device(
-        "cuda" if torch.cuda.is_available() else "cpu"
+        "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
     )
 
     model = load_model(
@@ -57,21 +57,15 @@ def main():
         if not success:
             break
 
-        gray = cv2.cvtColor(
-            frame,
-            cv2.COLOR_BGR2GRAY,
-        )
+        faces = detector.detect_faces(frame)
 
-        faces = detector.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(60, 60),
-        )
+        for face_info in faces:
+            x, y, w, h = face_info["bbox"]
+            face = frame[y:y + h, x:x + w]
+            if face.size == 0:
+                continue
 
-        for x, y, w, h in faces:
-            face = frame[y:y+h, x:x+w]
-            emotion, confidence = predict_emotion(
+            emotion, confidence, probs = predict_emotion(
                 model,
                 face,
                 device,
